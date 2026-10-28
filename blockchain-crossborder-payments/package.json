@@ -1,0 +1,23 @@
+{
+  "name": "blockchain-crossborder-payments",
+  "version": "1.0.0",
+  "description": "Permissioned Blockchain-Based Cross-Border Payments System with PoA Consensus, Smart Contracts, and FX Oracles",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node test/simulation.test.js"
+  },
+  "keywords": [
+    "blockchain",
+    "cross-border-payments",
+    "smart-contract",
+    "proof-of-authority",
+    "consortium",
+    "fintech"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "dependencies": {
+    "mongodb": "^7.7.0"
+  }
+}

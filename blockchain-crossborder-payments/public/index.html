@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blockchain Cross-Border Payments System (PoA Consortium)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Navigation Bar -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <i data-lucide="link" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+            Cross-Border Payments Rail
+          </h1>
+          <p class="text-xs text-indigo-400 font-medium flex items-center gap-1.5">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Consortium PoA Blockchain Network
+          </p>
+        </div>
+      </div>
+
+      <!-- Network & Database Badges -->
+      <div class="flex items-center space-x-3 text-xs">
+        <div class="hidden md:flex items-center space-x-2 bg-slate-800/80 border border-slate-700/60 px-3 py-1.5 rounded-lg">
+          <i data-lucide="database" class="w-4 h-4 text-emerald-400"></i>
+          <span class="text-slate-400">MongoDB:</span>
+          <span id="mongoStatusBadge" class="font-semibold text-emerald-400">Connecting...</span>
+        </div>
+        <div class="hidden sm:flex items-center space-x-2 bg-slate-800/80 border border-slate-700/60 px-3 py-1.5 rounded-lg">
+          <i data-lucide="blocks" class="w-4 h-4 text-indigo-400"></i>
+          <span class="text-slate-400">Block Height:</span>
+          <span id="blockHeightBadge" class="font-bold text-white">0</span>
+        </div>
+        <div class="flex items-center space-x-2 bg-slate-800/80 border border-slate-700/60 px-3 py-1.5 rounded-lg">
+          <i data-lucide="shield-check" class="w-4 h-4 text-cyan-400"></i>
+          <span class="text-slate-400">Consensus:</span>
+          <span class="font-semibold text-cyan-300">Proof of Authority</span>
+        </div>
+        <div class="hidden lg:flex items-center space-x-1.5 bg-emerald-950/60 border border-emerald-800/60 text-emerald-300 px-3 py-1.5 rounded-lg">
+          <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+          <span>Gas Fee: $0.00</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Role Switcher & Tab Navigation -->
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+      <div class="flex items-center space-x-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800">
+        <button onclick="switchTab('wizard')" id="tabBtn-wizard" class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 transition-all">
+          <i data-lucide="send" class="w-4 h-4"></i>
+          <span>Payment Flow & State Diagram</span>
+        </button>
+        <button onclick="switchTab('explorer')" id="tabBtn-explorer" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 transition-all">
+          <i data-lucide="box" class="w-4 h-4"></i>
+          <span>Consortium Blockchain Explorer</span>
+        </button>
+        <button onclick="switchTab('oracle')" id="tabBtn-oracle" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 transition-all">
+          <i data-lucide="line-chart" class="w-4 h-4"></i>
+          <span>FX Oracle & FX Rates</span>
+        </button>
+        <button onclick="switchTab('mongodb')" id="tabBtn-mongodb" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 transition-all">
+          <i data-lucide="database" class="w-4 h-4"></i>
+          <span>MongoDB Collections</span>
+        </button>
+      </div>
+
+      <!-- Quick Role Indicator -->
+      <div class="flex items-center space-x-2 text-xs bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-300">
+        <span class="text-slate-500">Active Consortium Node:</span>
+        <span id="activeNodeText" class="font-mono font-semibold text-indigo-400">NODE_JPM_US (JP Morgan Chase)</span>
+      </div>
+    </div>
+
+    <!-- TAB 1: PAYMENT FLOW & STATE MACHINE (WIZARD) -->
+    <div id="tabContent-wizard" class="tab-pane space-y-6">
+      
+      <!-- Interactive State Diagram Card -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-base font-semibold text-white flex items-center gap-2">
+              <i data-lucide="workflow" class="w-5 h-5 text-indigo-400"></i>
+              Live Cross-Border Payment State Diagram
+            </h2>
+            <p class="text-xs text-slate-400">Real-time state tracking as defined in the payment specification</p>
+          </div>
+          <div id="stateStatusBadge" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+            Current State: READY / IDLE
+          </div>
+        </div>
+
+        <!-- Horizontal State Machine Track -->
+        <div class="overflow-x-auto pb-3 pt-2">
+          <div class="flex items-center min-w-[1100px] justify-between relative px-2">
+            <!-- Connecting line -->
+            <div class="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-1 bg-slate-800 z-0"></div>
+
+            <!-- State 1: START -->
+            <div id="node-START" class="state-node z-10 flex flex-col items-center group">
+              <div class="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xs font-bold transition-all shadow">
+                <i data-lucide="play" class="w-4 h-4 text-slate-300"></i>
+              </div>
+              <span class="text-[11px] font-semibold mt-2 text-slate-400">START</span>
+            </div>
+
+            <!-- State 2: Sender Login / Auth -->
+            <div id="node-LOGIN" class="state-node z-10 flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xs font-bold transition-all shadow">
+                <i data-lucide="user-check" class="w-4 h-4 text-slate-300"></i>
+              </div>
+              <span class="text-[11px] font-semibold mt-2 text-slate-400 text-center max-w-[80px]">Sender Login & Auth</span>
+            </div>
+
+            <!-- State 3: Enter Beneficiary & Amount -->
+            <div id="node-ENTER_DETAILS" class="state-node z-10 flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xs font-bold transition-all shadow">
+                <i data-lucide="edit-3" class="w-4 h-4 text-slate-300"></i>
+              </div>
+              <span class="text-[11px] font-semibold mt-2 text-slate-400 text-center max-w-[90px]">Enter Details & Amount</span>
+            </div>
+
+            <!-- State 4: Validate Payment Details -->
+            <div id="node-VALIDATE_DETAILS" class="state-node z-10 flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xs font-bold transition-all shadow">
+                <i data-lucide="check-circle" class="w-4 h-4 text-slate-300"></i>
+              </div>
+              <span class="text-[11px] font-semibold mt-2 text-slate-400 text-center max-w-[80px]">Validate Details</span>
+            </div>
+
+            <!-- State 5: Create Payment Transaction -->
+            <div id="node-CREATE_TX" class="state-node z-10 flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xs font-bold transition-all shadow">
+                <i data-lucide="file-plus" class="w-4 h-4 text-slate-300"></i>
+              </div>
+              <span class="text-[11px] font-semibold mt-2 text-slate-400 text-center max-w-[80px]">Create Tx</span>
+            </div>
+
+            <!-- State 6: Smart Contract Checks -->
+            <div id="node-SMART_CONTRACT" class="state-node z-10 flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xs font-bold transition-all shadow">
+                <i data-lucide="cpu" class="w-4 h-4 text-slate-300"></i>
+              </div>
+              <span class="text-[11px] font-semibold mt-2 text-slate-400 text-center max-w-[90px]">Smart Contract Rules</span>
+            </div>
+
+            <!-- State 7: PoA Consensus -->
+            <div id="node-POA_CONSENSUS" class="state-node z-10 flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xs font-bold transition-all shadow">
+                <i data-lucide="users" class="w-4 h-4 text-slate-300"></i>
+              </div>
+              <span class="text-[11px] font-semibold mt-2 text-slate-400 text-center max-w-[90px]">PoA Consensus</span>
+            </div>
+
+            <!-- State 8: Record on Blockchain -->
+            <div id="node-RECORD_BLOCKCHAIN" class="state-node z-10 flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xs font-bold transition-all shadow">
+                <i data-lucide="database" class="w-4 h-4 text-slate-300"></i>
+              </div>
+              <span class="text-[11px] font-semibold mt-2 text-slate-400 text-center max-w-[90px]">Record on Blockchain</span>
+            </div>
+
+            <!-- State 9: Settlement / Off-Ramp -->
+            <div id="node-SETTLEMENT" class="state-node z-10 flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xs font-bold transition-all shadow">
+                <i data-lucide="landmark" class="w-4 h-4 text-slate-300"></i>
+              </div>
+              <span class="text-[11px] font-semibold mt-2 text-slate-400 text-center max-w-[90px]">Settlement / Off-Ramp</span>
+            </div>
+
+            <!-- State 10: Beneficiary Receives Funds -->
+            <div id="node-BENEFICIARY_RECEIVES" class="state-node z-10 flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xs font-bold transition-all shadow">
+                <i data-lucide="wallet" class="w-4 h-4 text-slate-300"></i>
+              </div>
+              <span class="text-[11px] font-semibold mt-2 text-slate-400 text-center max-w-[90px]">Funds Disbursed</span>
+            </div>
+
+            <!-- State 11: View Status / END -->
+            <div id="node-END" class="state-node z-10 flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xs font-bold transition-all shadow">
+                <i data-lucide="check" class="w-4 h-4 text-slate-300"></i>
+              </div>
+              <span class="text-[11px] font-semibold mt-2 text-slate-400">END</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Rejection / Validation Failed Notice -->
+        <div id="rejectionNotice" class="hidden mt-3 p-3 bg-rose-950/60 border border-rose-800/80 rounded-xl text-xs text-rose-300 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400"></i>
+            <span id="rejectionMessage">Validation Failed: Transaction rejected by smart contract rules.</span>
+          </div>
+          <button onclick="dismissRejection()" class="text-rose-400 hover:text-white">&times;</button>
+        </div>
+      </div>
+
+      <!-- Two-Column Operational Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Column: Payment Initiation & Controls (5 cols) -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+              <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-cyan-400"></i>
+                Initiate Cross-Border Transfer
+              </h3>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">
+                Consortium Rail
+              </span>
+            </div>
+
+            <form id="paymentForm" onsubmit="event.preventDefault();" class="space-y-4">
+              <!-- Sender Selector -->
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Sender (Payer)</label>
+                <select id="senderSelect" onchange="onSenderChange()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                  <!-- Populated dynamically -->
+                </select>
+                <div id="senderBalanceInfo" class="text-[11px] text-slate-500 mt-1 flex justify-between">
+                  <span>Balance: <span id="senderBalance" class="text-slate-300 font-medium">Loading...</span></span>
+                  <span>KYC: <span class="text-emerald-400 font-medium">VERIFIED</span></span>
+                </div>
+              </div>
+
+              <!-- Beneficiary Selector -->
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Beneficiary (Receiver)</label>
+                <select id="beneficiarySelect" onchange="updateFxConversionPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                  <!-- Populated dynamically -->
+                </select>
+                <div id="beneficiaryInfo" class="text-[11px] text-slate-500 mt-1 flex justify-between">
+                  <span>Country & Rail: <span id="beneficiaryRail" class="text-slate-300 font-medium">India (INR)</span></span>
+                  <span>KYC: <span class="text-emerald-400 font-medium">VERIFIED</span></span>
+                </div>
+              </div>
+
+              <!-- Amount & Currencies -->
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Transfer Amount (USD)</label>
+                <div class="relative">
+                  <input type="number" id="transferAmount" value="1250" min="1" step="any" oninput="updateFxConversionPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-lg pl-3 pr-16 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono">
+                  <div class="absolute right-3 top-2 text-xs font-medium text-slate-400">USD</div>
+                </div>
+              </div>
+
+              <!-- FX Oracle Calculation Card -->
+              <div class="p-3 bg-slate-950 border border-slate-800/90 rounded-xl space-y-1.5 text-xs">
+                <div class="flex items-center justify-between text-slate-400 text-[11px]">
+                  <span class="flex items-center gap-1">
+                    <i data-lucide="radio" class="w-3 h-3 text-cyan-400"></i>
+                    Oracle Exchange Rate:
+                  </span>
+                  <span id="oracleFxRateText" class="font-mono text-cyan-300 font-medium">1 USD = 83.4500 INR</span>
+                </div>
+                <div class="flex items-center justify-between font-semibold text-white pt-1 border-t border-slate-800/80">
+                  <span class="text-slate-400">Beneficiary Receives:</span>
+                  <span id="beneficiaryReceivesText" class="text-sm font-mono text-emerald-400">104,312.50 INR</span>
+                </div>
+              </div>
+
+              <!-- Validator Node Selection for PoA -->
+              <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Consensus Validator Node (PoA)</label>
+                <select id="validatorSelect" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+                  <option value="NODE_JPM_US">NODE_JPM_US - JP Morgan Chase (USA)</option>
+                  <option value="NODE_HSBC_UK">NODE_HSBC_UK - HSBC London (UK)</option>
+                  <option value="NODE_DB_EU">NODE_DB_EU - Deutsche Bank (Germany)</option>
+                  <option value="NODE_SBI_IN">NODE_SBI_IN - State Bank of India (India)</option>
+                </select>
+              </div>
+
+              <!-- Execution Buttons -->
+              <div class="pt-2 space-y-2">
+                <button type="button" onclick="executeOneClickWorkflow()" id="btnOneClick" class="w-full bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-medium py-2.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/30 transition-all">
+                  <i data-lucide="sparkles" class="w-4 h-4"></i>
+                  <span>Execute Full End-to-End Workflow</span>
+                </button>
+
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                  <button type="button" onclick="stepInitiateOnly()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 px-3 rounded-lg text-xs font-medium transition-all">
+                    Step 1: Initiate Only
+                  </button>
+                  <button type="button" onclick="stepMineAndSettle()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 px-3 rounded-lg text-xs font-medium transition-all">
+                    Step 2: Mine & Settle
+                  </button>
+                </div>
+
+                <!-- Simulation / Edge Cases Trigger -->
+                <div class="pt-2 flex items-center justify-between text-[11px] text-slate-400">
+                  <span>Test Edge Cases:</span>
+                  <div class="space-x-1">
+                    <button type="button" onclick="triggerExceedLimit()" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-rose-900/50 hover:text-rose-300 text-slate-400 border border-slate-700 transition">
+                      Exceed Limit ($60k)
+                    </button>
+                    <button type="button" onclick="triggerOverdraft()" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-rose-900/50 hover:text-rose-300 text-slate-400 border border-slate-700 transition">
+                      Zero Balance
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Right Column: Live Execution Terminal & Active Payment Receipt (7 cols) -->
+        <div class="lg:col-span-7 space-y-6">
+          
+          <!-- Execution Console / Steps Log -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+              <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                <i data-lucide="terminal" class="w-4 h-4 text-emerald-400"></i>
+                Consortium Payment Execution Engine
+              </h3>
+              <button onclick="clearConsole()" class="text-slate-500 hover:text-slate-300 text-xs">Clear Log</button>
+            </div>
+
+            <div id="consoleLog" class="h-64 overflow-y-auto space-y-2 font-mono text-[11px] p-3 bg-slate-950 rounded-xl border border-slate-800/80">
+              <div class="text-slate-500">// System ready. Waiting to initiate cross-border payment...</div>
+            </div>
+          </div>
+
+          <!-- Active Transaction Receipt Card -->
+          <div id="receiptCard" class="hidden bg-slate-900 border border-indigo-900/50 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+            <div class="absolute right-0 top-0 translate-x-4 -translate-y-4 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+              <div class="flex items-center space-x-2">
+                <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                <h4 class="text-xs font-bold text-white uppercase tracking-wider">Settlement Receipt</h4>
+              </div>
+              <span id="receiptTxId" class="text-xs font-mono text-indigo-400">TX-XXXX</span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-3">
+              <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">
+                <div class="text-[10px] text-slate-500 uppercase">Sender</div>
+                <div id="receiptSender" class="font-medium text-white truncate">Alice Johnson</div>
+              </div>
+              <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">
+                <div class="text-[10px] text-slate-500 uppercase">Beneficiary</div>
+                <div id="receiptBeneficiary" class="font-medium text-white truncate">Raj Sharma</div>
+              </div>
+              <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">
+                <div class="text-[10px] text-slate-500 uppercase">Disbursed</div>
+                <div id="receiptAmount" class="font-bold text-emerald-400 truncate">104,312.50 INR</div>
+              </div>
+              <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">
+                <div class="text-[10px] text-slate-500 uppercase">Block Recorded</div>
+                <div id="receiptBlock" class="font-mono text-indigo-300 truncate">Block #1</div>
+              </div>
+            </div>
+
+            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800 text-[11px] font-mono text-slate-400 space-y-1">
+              <div class="flex justify-between">
+                <span>PoA Validator:</span>
+                <span id="receiptValidator" class="text-slate-200">NODE_JPM_US</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Settlement Rail Ref:</span>
+                <span id="receiptSettlementRef" class="text-cyan-400">SETTLE-981F</span>
+              </div>
+              <div class="flex justify-between truncate">
+                <span>Block SHA-256:</span>
+                <span id="receiptBlockHash" class="text-slate-400 text-[10px] truncate max-w-[280px]">0000...</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Recent Transactions Table -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+            <i data-lucide="list-ordered" class="w-4 h-4 text-indigo-400"></i>
+            Consortium Transaction Ledger (MongoDB Persistence)
+          </h3>
+          <button onclick="loadTransactions()" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+            <i data-lucide="refresh-cw" class="w-3 h-3"></i> Refresh
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-950/80 text-slate-400 uppercase text-[10px] border-b border-slate-800">
+              <tr>
+                <th class="py-2.5 px-3">Tx ID</th>
+                <th class="py-2.5 px-3">Sender</th>
+                <th class="py-2.5 px-3">Beneficiary</th>
+                <th class="py-2.5 px-3">Sent Amount</th>
+                <th class="py-2.5 px-3">Beneficiary Receives</th>
+                <th class="py-2.5 px-3">Rate</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3">Block</th>
+              </tr>
+            </thead>
+            <tbody id="txTableBody" class="divide-y divide-slate-800/60 font-mono">
+              <tr>
+                <td colspan="8" class="text-center py-4 text-slate-500 font-sans">No transactions yet. Initiate one above!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: BLOCKCHAIN EXPLORER & CONSORTIUM VALIDATORS -->
+    <div id="tabContent-explorer" class="tab-pane hidden space-y-6">
+      
+      <!-- Explorer Header Card & Tamper Proof Controls -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-5 h-5 text-indigo-400"></i>
+              Cryptographic Proof of Authority Consortium Ledger
+            </h2>
+            <p class="text-xs text-slate-400">Blocks are verified and cryptographically signed exclusively by authorized member bank nodes.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="verifyBlockchainIntegrity()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center space-x-1.5 shadow-lg shadow-emerald-600/20 transition">
+              <i data-lucide="check-check" class="w-4 h-4"></i>
+              <span>Verify Cryptographic Integrity</span>
+            </button>
+            <button onclick="tamperSimulation()" class="bg-rose-900/60 hover:bg-rose-800/80 border border-rose-700/80 text-rose-200 text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center space-x-1.5 transition">
+              <i data-lucide="alert-octagon" class="w-4 h-4"></i>
+              <span>Simulate Tampering</span>
+            </button>
+            <button onclick="repairChain()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2 rounded-xl transition">
+              Restore Chain
+            </button>
+          </div>
+        </div>
+
+        <!-- Verification Banner Result -->
+        <div id="integrityResultBanner" class="mt-4 hidden p-3 rounded-xl text-xs flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i id="integrityIcon" data-lucide="shield-check" class="w-4 h-4"></i>
+            <span id="integrityText">Integrity verified.</span>
+          </div>
+        </div>
+
+        <!-- Authorized Bank Validator Nodes Grid -->
+        <div class="mt-4">
+          <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Authorized PoA Validator Nodes</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            
+            <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-lg bg-indigo-950 border border-indigo-800 flex items-center justify-center text-indigo-400 font-bold text-xs">
+                JPM
+              </div>
+              <div class="text-xs min-w-0">
+                <div class="font-semibold text-white truncate">JP Morgan Chase</div>
+                <div class="text-[10px] text-slate-500 font-mono">NODE_JPM_US &bull; USA</div>
+                <span class="inline-block mt-0.5 text-[9px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-400 border border-emerald-900">ACTIVE VALIDATOR</span>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-lg bg-red-950 border border-red-800 flex items-center justify-center text-red-400 font-bold text-xs">
+                HSBC
+              </div>
+              <div class="text-xs min-w-0">
+                <div class="font-semibold text-white truncate">HSBC London</div>
+                <div class="text-[10px] text-slate-500 font-mono">NODE_HSBC_UK &bull; GBR</div>
+                <span class="inline-block mt-0.5 text-[9px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-400 border border-emerald-900">ACTIVE VALIDATOR</span>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-lg bg-blue-950 border border-blue-800 flex items-center justify-center text-blue-400 font-bold text-xs">
+                DB
+              </div>
+              <div class="text-xs min-w-0">
+                <div class="font-semibold text-white truncate">Deutsche Bank</div>
+                <div class="text-[10px] text-slate-500 font-mono">NODE_DB_EU &bull; DEU</div>
+                <span class="inline-block mt-0.5 text-[9px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-400 border border-emerald-900">ACTIVE VALIDATOR</span>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-lg bg-sky-950 border border-sky-800 flex items-center justify-center text-sky-400 font-bold text-xs">
+                SBI
+              </div>
+              <div class="text-xs min-w-0">
+                <div class="font-semibold text-white truncate">State Bank of India</div>
+                <div class="text-[10px] text-slate-500 font-mono">NODE_SBI_IN &bull; IND</div>
+                <span class="inline-block mt-0.5 text-[9px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-400 border border-emerald-900">ACTIVE VALIDATOR</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Mined Blocks List -->
+      <div class="space-y-4">
+        <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+          <i data-lucide="layers" class="w-4 h-4 text-indigo-400"></i>
+          Cryptographic Block Sequence (MongoDB `blocks` collection)
+        </h3>
+        <div id="blocksListContainer" class="space-y-3">
+          <!-- Dynamically populated block cards -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 3: FX ORACLE & FX RATES -->
+    <div id="tabContent-oracle" class="tab-pane hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="line-chart" class="w-5 h-5 text-indigo-400"></i>
+              Financial FX Oracle Data Feed
+            </h2>
+            <p class="text-xs text-slate-400">Off-chain exchange rates cryptographically signed by the Consortium Oracle.</p>
+          </div>
+          <span class="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-300 font-mono">Base: 1.00 USD</span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" id="oracleRatesGrid">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Oracle Currency Simulator -->
+        <div class="mt-6 p-4 bg-slate-950 border border-slate-800 rounded-xl">
+          <h3 class="text-xs font-semibold text-slate-300 mb-2">Simulate Cross-Border FX Conversion</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] text-slate-500 mb-1">Amount</label>
+              <input type="number" id="simAmount" value="5000" class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500 mb-1">Target Currency</label>
+              <select id="simTargetCurrency" class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white">
+                <option value="INR">INR - Indian Rupee</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="JPY">JPY - Japanese Yen</option>
+                <option value="CAD">CAD - Canadian Dollar</option>
+                <option value="SGD">SGD - Singapore Dollar</option>
+                <option value="AED">AED - UAE Dirham</option>
+              </select>
+            </div>
+            <div class="flex items-end">
+              <button onclick="calculateSimulatedFx()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium py-1.5 rounded transition">
+                Generate Signed Quote
+              </button>
+            </div>
+          </div>
+          <div id="simQuoteResult" class="hidden mt-3 p-3 bg-slate-900 rounded border border-slate-800 font-mono text-xs text-slate-300">
+            <!-- Output -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: MONGODB DOCUMENT INSPECTOR -->
+    <div id="tabContent-mongodb" class="tab-pane hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-4">
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="database" class="w-5 h-5 text-emerald-400"></i>
+              Live MongoDB Collections & Documents Inspector
+            </h2>
+            <p class="text-xs text-slate-400">Database: <code class="text-emerald-400 font-mono">crossborder_payments</code></p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <select id="mongoCollectionSelect" onchange="loadMongoCollectionData()" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none">
+              <option value="blocks">Collection: blocks</option>
+              <option value="transactions">Collection: transactions</option>
+              <option value="participants">Collection: participants</option>
+              <option value="audit_logs">Collection: audit_logs</option>
+            </select>
+            <button onclick="loadMongoCollectionData()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs flex items-center gap-1">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Collection Stats Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+            <div class="text-[10px] text-slate-500 uppercase">Blocks Document Count</div>
+            <div id="statBlocksCount" class="text-lg font-bold text-indigo-400 font-mono">0</div>
+          </div>
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+            <div class="text-[10px] text-slate-500 uppercase">Transactions Count</div>
+            <div id="statTxsCount" class="text-lg font-bold text-cyan-400 font-mono">0</div>
+          </div>
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+            <div class="text-[10px] text-slate-500 uppercase">Participants Enrolled</div>
+            <div id="statParticipantsCount" class="text-lg font-bold text-emerald-400 font-mono">0</div>
+          </div>
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+            <div class="text-[10px] text-slate-500 uppercase">Audit Log Events</div>
+            <div id="statAuditCount" class="text-lg font-bold text-amber-400 font-mono">0</div>
+          </div>
+        </div>
+
+        <!-- Raw JSON Viewer -->
+        <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 font-mono text-xs overflow-x-auto max-h-[500px]">
+          <pre id="mongoRawJson" class="text-slate-300 whitespace-pre">// Loading documents from MongoDB...</pre>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 bg-slate-950/60 py-4 text-center text-xs text-slate-500">
+    <p>Blockchain-Based Cross-Border Payments Model &bull; PoA Consortium &bull; MongoDB Document Store &bull; Smart Contract &amp; FX Oracle Integration</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

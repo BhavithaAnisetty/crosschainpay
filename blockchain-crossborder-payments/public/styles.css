@@ -1,0 +1,102 @@
+/* Custom Styles & State Diagram Animations */
+
+/* Active tab styling */
+.tab-btn.active {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.25), rgba(59, 130, 246, 0.25));
+  border: 1px solid rgba(99, 102, 241, 0.5);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+}
+
+.tab-btn:not(.active) {
+  color: #94a3b8;
+}
+
+.tab-btn:not(.active):hover {
+  color: #f1f5f9;
+  background-color: rgba(30, 41, 59, 0.5);
+}
+
+/* State Node Machine States */
+.state-node {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.state-node .w-10 {
+  transition: all 0.3s ease;
+}
+
+/* Node Active / Processing */
+.state-node.active-step .w-10 {
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  border-color: #60a5fa;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.7);
+  transform: scale(1.15);
+  animation: pulse-glow 1.5s infinite ease-in-out;
+}
+
+.state-node.active-step span {
+  color: #93c5fd;
+  font-weight: 700;
+}
+
+/* Node Completed */
+.state-node.completed-step .w-10 {
+  background: #064e3b;
+  border-color: #10b981;
+  color: #34d399;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.state-node.completed-step span {
+  color: #6ee7b7;
+}
+
+/* Node Rejected / Error */
+.state-node.error-step .w-10 {
+  background: #881337;
+  border-color: #f43f5e;
+  color: #fda4af;
+  box-shadow: 0 0 16px rgba(244, 63, 94, 0.6);
+  animation: shake 0.5s ease-in-out;
+}
+
+.state-node.error-step span {
+  color: #f43f5e;
+  font-weight: 700;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(59, 130, 246, 0.95);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090d16;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
